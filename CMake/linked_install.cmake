@@ -28,13 +28,12 @@ macro(symlink src dst)
     elseif(IS_SYMLINK "${dst_file}")
         file(REMOVE "${dst_file}")
     endif()
+    message("-- Symlinking: ${dst_file}")
     execute_process(
         COMMAND cmake -E create_symlink "${src}" "${dst_file}"
         RESULT_VARIABLE rc)
     if(rc)
         message(FATAL_ERROR "create_symlink failed! old:${src} new:${dst_file}")
-    else()
-        message("-- Symlinking: ${dst_file}")
     endif()
 endmacro()
 
