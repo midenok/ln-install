@@ -1,13 +1,14 @@
 # Symlinked Install
 
-Supplies `autoconf` or `cmake` configured trees with symlinked version of `make install`.
+Supplies `autoconf`, `cmake` or `MakeMaker` configured trees with symlinked version of `make install`.
 I.e. it will create symlinks to binaries in compiled tree instead of copying them.
 This speeds up development inside large source trees with repeated fix-compile-run cycles.
 
 ### Installation
-Just add `ln-install` dir into PATH before standard binaries.
+Just add path to `ln-install` into beginning of `PATH` for `autoconf` or `cmake` based trees.
+Add path to `ln-install` into `PERL5LIB` (and export) for `MakeMaker` trees.
+
 
 ### Usage
-Autoconf-ed `make install` then will take wrapper `ln-install/install` instead of `/usr/bin/install`.
-
-For cmake-d sources use `cmake-ln` instead of `cmake`.
+For `autoconf` or `MakeMaker` trees just run  `make install` as usual.
+For `cmake`-d sources use `cmake-ln` instead of `cmake`.
