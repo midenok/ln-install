@@ -11,4 +11,5 @@ Add path to `ln-install` into `PERL5LIB` (and export) for `MakeMaker` trees.
 
 ### Usage
 For `autoconf` or `MakeMaker` trees just run  `make install` as usual.
+
 For `cmake`-d sources use `cmake-ln` instead of `cmake`.
