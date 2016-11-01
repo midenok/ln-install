@@ -2,7 +2,7 @@
 
 Supplies `autoconf`, `cmake` or `MakeMaker` configured trees with symlinked version of `make install`.
 I.e. it will create symlinks to binaries in compiled tree instead of copying them.
-This speeds up development inside large source trees with repeated fix-compile-run cycles.
+This speeds up development inside large source trees with repeated fix-compile-run cycles as this eliminates the need to run `make install` multiple times.
 
 ### Installation
 Just add path to `ln-install` into beginning of `PATH` for `autoconf` or `cmake` based trees.
