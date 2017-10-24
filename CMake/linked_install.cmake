@@ -42,64 +42,80 @@ macro(symlink src dst rename)
     endif()
 endmacro()
 
-function(FILE CMD)
-    if(CMD STREQUAL INSTALL)
-        set(args ${ARGN})
-        set(cmd FILES)
-        set(type FILE)
-        # join(args " " trace)
+macro(symlink_dir src dst rename)
+    string(REGEX MATCH "/[.]?$" last_char "${src}")
+    if (NOT "${last_char}" STREQUAL "")
+        file(GLOB files "${src}*")
+        foreach(file ${files})
+            # message("symlink ${file} ${dst} ${rename}")
+            symlink("${file}" "${dst}" "${rename}")
+        endforeach()
+    else()
+        # message("symlink ${src} ${dst} ${rename}")
+        symlink("${src}" "${dst}" "${rename}")
+    endif()
+endmacro()
+
+function(FILE _CMD)
+    if(_CMD STREQUAL INSTALL)
+        set(_args ${ARGN})
+        set(_cmd FILES)
+        set(_type FILE)
+        # join(_args " " trace)
         # message("INSTALL " ${trace})
-        while (args)
-            pop(args arg)
-            if(arg STREQUAL DESTINATION)
-                set(cmd ${arg})
-                pop(args dest)
-            elseif(arg STREQUAL FILES OR arg STREQUAL PROGRAMS)
-                set(cmd FILES)
-                pop(args files)
-            elseif(arg STREQUAL TYPE)
-                set(cmd ${arg})
-                pop(args type)
-            elseif(arg STREQUAL RENAME)
-                set(cmd ${arg})
-                pop(args rename)
-            elseif(arg STREQUAL FILE_PERMISSIONS OR
-                    arg STREQUAL DIRECTORY_PERMISSIONS OR
-                    arg STREQUAL NO_SOURCE_PERMISSIONS OR
-                    arg STREQUAL USE_SOURCE_PERMISSIONS OR
-                    arg STREQUAL FILES_MATCHING OR
-                    arg STREQUAL PATTERN OR
-                    arg STREQUAL REGEX OR
-                    arg STREQUAL EXCLUDE OR
-                    arg STREQUAL PERMISSIONS OR
-                    arg STREQUAL CONFIGURATIONS OR
-                    arg STREQUAL COMPONENT OR
-                    arg STREQUAL OPTIONAL OR
-                    arg STREQUAL MESSAGE_NEVER OR
-                    arg STREQUAL EXCLUDE_FROM_ALL)
-                set(cmd ${arg})
+        while (_args)
+            pop(_args _arg)
+            if(_arg STREQUAL DESTINATION)
+                set(_cmd ${_arg})
+                pop(_args _dest)
+            elseif(_arg STREQUAL FILES OR _arg STREQUAL PROGRAMS)
+                set(_cmd FILES)
+                pop(_args _files)
+            elseif(_arg STREQUAL TYPE)
+                set(_cmd ${_arg})
+                pop(_args _type)
+            elseif(_arg STREQUAL RENAME)
+                set(_cmd ${_arg})
+                pop(_args _rename)
+            elseif(_arg STREQUAL FILE_PERMISSIONS OR
+                    _arg STREQUAL DIRECTORY_PERMISSIONS OR
+                    _arg STREQUAL NO_SOURCE_PERMISSIONS OR
+                    _arg STREQUAL USE_SOURCE_PERMISSIONS OR
+                    _arg STREQUAL FILES_MATCHING OR
+                    _arg STREQUAL PATTERN OR
+                    _arg STREQUAL REGEX OR
+                    _arg STREQUAL EXCLUDE OR
+                    _arg STREQUAL PERMISSIONS OR
+                    _arg STREQUAL CONFIGURATIONS OR
+                    _arg STREQUAL COMPONENT OR
+                    _arg STREQUAL OPTIONAL OR
+                    _arg STREQUAL MESSAGE_NEVER OR
+                    _arg STREQUAL EXCLUDE_FROM_ALL)
+                set(_cmd ${_arg})
             else()
-                if(cmd STREQUAL FILES)
-                    push(files "${arg}")
+                if(_cmd STREQUAL FILES)
+                    push(_files "${_arg}")
                 endif()
             endif()
         endwhile()
         # message("dest: " ${dest} "; files: " ${files})
-        if(NOT type STREQUAL DIRECTORY)
-            foreach(file ${files})
-                symlink(${file} ${dest} "${rename}")
-            endforeach()
-        else()
-            # https://cmake.org/cmake/help/v3.7/command/install.html#installing-directories
-            # INSTALL
-            # DESTINATION /home/midenok/src/kde/kdevelop/stable/opt/share/icons/hicolor
-            # TYPE DIRECTORY
-            # FILES /home/midenok/src/kde/kdevelop/stable/kdevplatform/pics/16x16
-            # message(${ARGV})
-            _FILE(${ARGV})
-        endif()
+        foreach(_file ${_files})
+            if(_type STREQUAL DIRECTORY)
+                # https://cmake.org/cmake/help/v3.7/command/install.html#installing-directories
+                # message(${ARGV})
+                symlink_dir("${_file}" "${_dest}" "${_rename}")
+            else()
+                symlink("${_file}" "${_dest}" "${_rename}")
+            endif()
+        endforeach()
     else()
         # message(${ARGV})
+        get_cmake_property(_vars_before VARIABLES)
         _FILE(${ARGV})
+        get_cmake_property(_vars_after VARIABLES)
+        list(REMOVE_ITEM _vars_after _vars_before ${_vars_before})
+        foreach (_var ${_vars_after})
+            set(${_var} ${${_var}} PARENT_SCOPE)
+        endforeach()
     endif()
 endfunction(FILE)
