@@ -1,0 +1,5 @@
+#!/bin/bash
+src_dir=$(dirname $(readlink -f "$0"))
+mkdir -p ~/bin
+ln -sft ~/bin "${src_dir}/cmake-ln" "${src_dir}/install"
+echo "* Installed ln-install to ~/bin"
